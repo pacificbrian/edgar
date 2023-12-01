@@ -2,6 +2,7 @@ package edgar
 
 import (
 	"bufio"
+	"encoding/xml"
 	"errors"
 	"fmt"
 	"io"
@@ -12,7 +13,17 @@ import (
 	"sync"
 
 	"golang.org/x/net/html"
+	"golang.org/x/net/html/charset"
 )
+
+type secFilerInfo struct {
+	Info struct {
+		CIK     string `xml:"cik"`
+		SIC     string `xml:"assigned-sic,omitempty"`
+		SICDesc string `xml:"assigned-sic-desc,omitempty"`
+		Name    string `xml:"conformed-name"`
+	} `xml:"company-info"`
+}
 
 func parseCikAndDocID(url string) (string, string) {
 	var s1 string
@@ -53,26 +64,16 @@ func queryPageParser(page io.Reader, docType FilingType) map[string]string {
 }
 
 func cikPageParser(page io.Reader) (string, error) {
-	z := html.NewTokenizer(page)
-	token := z.Token()
-	for !(token.Data == "cik" && token.Type == html.StartTagToken) {
-		tt := z.Next()
-		if tt == html.ErrorToken {
-			return "", errors.New("Could not find the CIK")
-		}
-		token = z.Token()
+	var feed secFilerInfo
+
+	decoder := xml.NewDecoder(page)
+	decoder.CharsetReader = charset.NewReaderLabel
+	err := decoder.Decode(&feed)
+	if err != nil {
+		return "", errors.New(fmt.Sprintf("Could not find the CIK: %v", err))
 	}
-	for !(token.Data == "cik" && token.Type == html.EndTagToken) {
-		if token.Type == html.TextToken {
-			str := strings.TrimSpace(token.String())
-			if len(str) > 0 {
-				return str, nil
-			}
-		}
-		z.Next()
-		token = z.Token()
-	}
-	return "", errors.New("Could not find the CIK")
+
+	return feed.Info.CIK, nil
 }
 
 /*
