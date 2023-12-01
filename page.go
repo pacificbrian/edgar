@@ -5,6 +5,8 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"runtime"
+	"time"
 )
 
 var (
@@ -19,9 +21,18 @@ func createQueryURL(symbol string, docType FilingType) string {
 }
 
 func getPage(url string) io.ReadCloser {
-	resp, err := http.Get(url)
+	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
-		log.Fatal("Query to SEC page ", url, "failed: ", err)
+		log.Fatalf("Query to SEC page %s failed: %v", url, err)
+		return nil
+	}
+	agent := fmt.Sprintf(runtime.Version(), "/edgar")
+	req.Header.Set("User-Agent", agent)
+
+	client := &http.Client{Timeout: 10 * time.Second}
+	resp, err := client.Do(req)
+	if err != nil {
+		log.Fatalf("Query to SEC page %s failed: %v", url, err)
 		return nil
 	}
 	return resp.Body
@@ -31,6 +42,7 @@ func getCompanyCIK(ticker string) string {
 	url := fmt.Sprintf(cikURL, ticker)
 	r := getPage(url)
 	if r != nil {
+		defer r.Close()
 		if cik, err := cikPageParser(r); err == nil {
 			return cik
 		}
