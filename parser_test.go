@@ -54,7 +54,7 @@ func TestParsingXBRLDef(t *testing.T) {
 		return
 	}
 	if len(data) != 3 {
-		t.Error("Parser returned unexpected number of data items: " + string(len(data)))
+		t.Error("Parser returned unexpected number of data items: ", len(data))
 		return
 	}
 	if data[0] != "defref_us-gaap_StockholdersEquity" {
@@ -77,7 +77,7 @@ func TestParsingNumInLink(t *testing.T) {
 		return
 	}
 	if len(data) != 2 {
-		t.Error("Parser returned unexpected number of data items: " + string(len(data)))
+		t.Error("Parser returned unexpected number of data items: ", len(data))
 		return
 	}
 	if data[0] != "defref_dei_EntityCommonStockSharesOutstanding" {
