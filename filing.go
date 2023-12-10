@@ -300,3 +300,15 @@ func (f *filing) CollectedData() []string {
 
 	return ret
 }
+
+func (f *filing) ScaleMoney() int64 {
+	return int64(f.FinData.Scales[scaleEntityMoney])
+}
+
+func (f *filing) ScaleShares() int64 {
+	return int64(f.FinData.Scales[scaleEntityShares])
+}
+
+func (f *filing) ScalePerShare() int64 {
+	return int64(f.FinData.Scales[scaleEntityPerShare])
+}

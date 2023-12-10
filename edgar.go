@@ -46,6 +46,9 @@ type Filing interface {
 	Assets() (float64, error)
 	Liabilities() (float64, error)
 	CollectedData() []string
+	ScaleMoney() int64
+	ScaleShares() int64
+	ScalePerShare() int64
 }
 
 // CompanyFolder interface used to get filing information about a company

@@ -344,6 +344,7 @@ func finReportParser(page io.Reader, fr *financialReport, t filingDocType) (*fin
 		}
 		data, err = parseTableRow(z, true)
 	}
+	fr.Scales = scales
 	return fr, nil
 }
 

@@ -7,6 +7,7 @@ import (
 
 type financialReport struct {
 	DocType FilingType  `json:"Filing Type"`
+	Scales  map[scaleEntity]scaleFactor `json:"Scales"`
 	Entity  *entityData `json:"Entity Information"`
 	Ops     *opsData    `json:"Operational Information"`
 	Bs      *bsData     `json:"Balance Sheet Information"`
